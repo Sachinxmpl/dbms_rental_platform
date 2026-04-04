@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+  // output = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+}
+
+enum ItemStatus {
+  AVAILABLE
+  RENTED
+  UNAVAILABLE
+}
+
+enum ItemCategory {
+  ELECTRONICS
+  MUSICAL_INSTRUMENTS
+  VEHICLES
+  SPORTS_EQUIPMENT
+  TOOLS
+  CLOTHING
+  OTHER
+}
+
+enum RentalStatus {
+  PENDING      // renter requested, waiting for owner approval
+  APPROVED     // owner approved, deposit not yet paid
+  ACTIVE       // deposit paid, item handed over
+  RETURN_REQUESTED // renter says returned
+  COMPLETED    // owner confirmed return, deposit released
+  CANCELLED    // either side cancelled before ACTIVE
+  DISPUTED     // owner says item not returned / damaged
+}
+
+model User {
+  id                 String             @id @default(cuid())
+  email              String             @unique
+  password           String
+  name               String
+  phone              String?
+  avatarUrl          String?
+  role               UserRole           @default(USER)
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  governmentIdUrl    String?            // uploaded ID image URL
+  averageRating      Float              @default(0)
+  totalRatings       Int                @default(0)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  items              Item[]
+  rentalsAsRenter    Rental[]           @relation("RenterRentals")
+  rentalsAsOwner     Rental[]           @relation("OwnerRentals")
+  reviewsGiven       Review[]           @relation("ReviewsGiven")
+  reviewsReceived    Review[]           @relation("ReviewsReceived")
+}
+
+model Item {
+  id               String       @id @default(cuid())
+  title            String
+  description      String
+  category         ItemCategory
+  pricePerDay      Float
+  depositAmount    Float        // security deposit held during rental
+  images           String[]     // array of image URLs
+  location         String       // neighborhood / city
+  status           ItemStatus   @default(AVAILABLE)
+  ownerId          String
+  owner            User         @relation(fields: [ownerId], references: [id])
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  rentals          Rental[]
+}
+
+model Rental {
+  id                    String       @id @default(cuid())
+  itemId                String
+  item                  Item         @relation(fields: [itemId], references: [id])
+  renterId              String
+  renter                User         @relation("RenterRentals", fields: [renterId], references: [id])
+  ownerId               String
+  owner                 User         @relation("OwnerRentals", fields: [ownerId], references: [id])
+  
+  startDate             DateTime
+  endDate               DateTime
+  totalDays             Int
+  rentalAmount          Float        // pricePerDay * totalDays
+  depositAmount         Float        // snapshot of deposit at time of booking
+  depositPaid           Boolean      @default(false)
+  depositReleased       Boolean      @default(false)
+  
+  status                RentalStatus @default(PENDING)
+  
+  // Condition reports (photo URLs + notes at handover and return)
+  pickupConditionNote   String?
+  pickupConditionImages String[]
+  returnConditionNote   String?
+  returnConditionImages String[]
+  
+  ownerNote             String?      // owner message on approval/rejection
+  cancellationReason    String?
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  reviews               Review[]
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  rentalId     String
+  rental       Rental   @relation(fields: [rentalId], references: [id])
+  reviewerId   String
+  reviewer     User     @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  revieweeId   String
+  reviewee     User     @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+  rating       Int      // 1-5
+  comment      String?
+  createdAt    DateTime @default(now())
+
+  @@unique([rentalId, reviewerId]) // one review per person per rental
+}
