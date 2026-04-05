@@ -22,7 +22,7 @@ export default function Register() {
     (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     if (form.password.length < 8)
       return setError("Password must be at least 8 characters");
@@ -33,10 +33,10 @@ export default function Register() {
       toast("Account created! Please sign in.", "success");
       navigate("/login");
     } catch (err: unknown) {
-      if (axios.isAxiosError(err)){
+      if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message ?? "Registration failed");
-      }else {
-        setError("Something went wrong ")
+      } else {
+        setError("Something went wrong ");
       }
     } finally {
       setLoading(false);
@@ -104,7 +104,7 @@ export default function Register() {
               placeholder="you@example.com"
             />
             <Input
-              label="Phone (optional)"
+              label="Phone"
               value={form.phone}
               onChange={set("phone")}
               placeholder="98XXXXXXXX"

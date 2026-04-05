@@ -4,6 +4,8 @@ import { itemsApi } from "../api/client";
 import { Button } from "../components/ui/Button";
 import { Input, TextArea } from "../components/ui/Input";
 import { Card } from "../components/ui/Card";
+import { ImageUpload } from "../components/ui/ImageUpload";
+import { LocationPicker } from "../components/ui/LocationPicker";
 import { toast } from "../hooks/useToast";
 import axios from "axios";
 
@@ -25,9 +27,9 @@ export default function CreateItem() {
     category: "ELECTRONICS",
     pricePerDay: "",
     depositAmount: "",
-    location: "",
-    images: "",
   });
+  const [location, setLocation] = useState("");
+  const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -42,15 +44,14 @@ export default function CreateItem() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!form.title || form.title.length < 3)
-      e.title = "Title must be at least 3 characters";
+    if (!form.title || form.title.length < 3) e.title = "At least 3 characters";
     if (!form.description || form.description.length < 10)
-      e.description = "Description too short";
+      e.description = "At least 10 characters";
     if (!form.pricePerDay || Number(form.pricePerDay) <= 0)
       e.pricePerDay = "Enter a valid price";
     if (!form.depositAmount || Number(form.depositAmount) <= 0)
       e.depositAmount = "Enter a valid deposit";
-    if (!form.location) e.location = "Location is required";
+    if (!location) e.location = "Please pick a location on the map";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -60,16 +61,11 @@ export default function CreateItem() {
     if (!validate()) return;
     setLoading(true);
     try {
-      const images = form.images
-        ? form.images
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-        : [];
       const item = await itemsApi.create({
         ...form,
         pricePerDay: Number(form.pricePerDay),
         depositAmount: Number(form.depositAmount),
+        location,
         images,
       });
       toast("Item listed successfully!", "success");
@@ -117,12 +113,13 @@ export default function CreateItem() {
             placeholder="e.g. Yamaha Acoustic Guitar"
             error={errors.title}
           />
+
           <TextArea
             label="Description"
             required
             value={form.description}
             onChange={set("description")}
-            placeholder="Describe condition, included accessories, usage rules..."
+            placeholder="Describe condition, accessories, usage rules..."
             error={errors.description}
           />
 
@@ -187,21 +184,20 @@ export default function CreateItem() {
             />
           </div>
 
-          <Input
-            label="Location"
-            required
-            value={form.location}
-            onChange={set("location")}
-            placeholder="e.g. Thamel, Kathmandu"
-            error={errors.location}
-          />
-          <Input
-            label="Image URLs (comma-separated)"
-            value={form.images}
-            onChange={set("images")}
-            placeholder="https://..."
-            hint="Optional — add links to your item photos"
-          />
+          {/* Map location picker */}
+          <div>
+            <LocationPicker value={location} onChange={setLocation} />
+            {errors.location && (
+              <p
+                style={{ fontSize: "12px", color: "#DC2626", marginTop: "4px" }}
+              >
+                {errors.location}
+              </p>
+            )}
+          </div>
+
+          {/* Image uploader */}
+          <ImageUpload value={images} onChange={setImages} maxImages={5} />
 
           <div
             style={{

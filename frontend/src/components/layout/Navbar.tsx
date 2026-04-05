@@ -14,6 +14,14 @@ export function Navbar() {
     navigate("/login");
   };
 
+  const verificationConfig = user
+    ? {
+        UNVERIFIED: { label: "⚠️ Unverified", color: "#554b39" },
+        PENDING: { label: "🔄 Peding Verification", color: "#0284C7" },
+        VERIFIED: { label: "", color: "#16A34A" },
+      }[user.verificationStatus]
+    : null;
+
   return (
     <nav
       style={{
@@ -92,9 +100,12 @@ export function Navbar() {
               >
                 My Rentals
               </Link>
+
               <Button size="sm" onClick={() => navigate("/items/new")}>
                 + List Item
               </Button>
+
+              {/* User menu */}
               <div style={{ position: "relative" }}>
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
@@ -113,10 +124,29 @@ export function Navbar() {
                     url={user?.avatarUrl}
                     size={30}
                   />
-                  <span style={{ fontSize: "13px", fontWeight: 600 }}>
+
+                  <span
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
                     {user?.name.split(" ")[0]}
+
+                    {verificationConfig && (
+                      <span
+                        title={user?.verificationStatus}
+                        style={{ color: verificationConfig.color }}
+                      >
+                        {verificationConfig.label}
+                      </span>
+                    )}
                   </span>
                 </button>
+
                 {menuOpen && (
                   <div
                     style={{
@@ -131,30 +161,44 @@ export function Navbar() {
                       overflow: "hidden",
                     }}
                   >
-                    {[
-                      { label: "Profile", to: "/profile" },
-                      { label: "My Listings", to: "/items?mine=true" },
-                    ].map(({ label, to }) => (
-                      <Link
-                        key={to}
-                        to={to}
-                        onClick={() => setMenuOpen(false)}
-                        style={{
-                          display: "block",
-                          padding: "12px 16px",
-                          fontSize: "14px",
-                          color: "var(--text-primary)",
-                        }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.background = "var(--bg)")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.background = "transparent")
-                        }
-                      >
-                        {label}
-                      </Link>
-                    ))}
+                    <Link
+                      to="/profile"
+                      onClick={() => setMenuOpen(false)}
+                      style={{
+                        display: "block",
+                        padding: "12px 16px",
+                        fontSize: "14px",
+                        color: "var(--text-primary)",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.background = "var(--bg)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.background = "transparent")
+                      }
+                    >
+                      Profile
+                    </Link>
+
+                    <Link
+                      to="/items?mine=true"
+                      onClick={() => setMenuOpen(false)}
+                      style={{
+                        display: "block",
+                        padding: "12px 16px",
+                        fontSize: "14px",
+                        color: "var(--text-primary)",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.background = "var(--bg)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.background = "transparent")
+                      }
+                    >
+                      My Listings
+                    </Link>
+
                     <button
                       onClick={logout}
                       style={{
@@ -188,6 +232,7 @@ export function Navbar() {
               >
                 Sign in
               </Button>
+
               <Button size="sm" onClick={() => navigate("/register")}>
                 Join free
               </Button>

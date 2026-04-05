@@ -199,7 +199,7 @@ export default function Home() {
 
       {/* How it works */}
       <section
-        style={{ background: "var(--text-primary)", padding: "80px 24px" }}
+        style={{ background: "", padding: "80px 24px" }}
       >
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <h2
@@ -207,7 +207,6 @@ export default function Home() {
               fontFamily: "var(--font-display)",
               fontSize: "36px",
               fontWeight: 700,
-              color: "var(--white)",
               textAlign: "center",
               marginBottom: "12px",
             }}
@@ -216,7 +215,7 @@ export default function Home() {
           </h2>
           <p
             style={{
-              color: "#94A3B8",
+              color: "#101012",
               textAlign: "center",
               marginBottom: "52px",
               fontSize: "16px",
@@ -235,7 +234,7 @@ export default function Home() {
               <div
                 key={step.step}
                 style={{
-                  background: "rgba(255,255,255,0.05)",
+                  background: "var(--white)",
                   borderRadius: "var(--radius-card)",
                   padding: "28px 24px",
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -246,7 +245,7 @@ export default function Home() {
                     fontFamily: "var(--font-display)",
                     fontSize: "40px",
                     color: "var(--orange)",
-                    opacity: 0.3,
+                    opacity: 0.7,
                     fontWeight: 900,
                     marginBottom: "4px",
                   }}
@@ -258,7 +257,7 @@ export default function Home() {
                 </div>
                 <h3
                   style={{
-                    color: "var(--white)",
+                    color: "var(--black)",
                     fontSize: "17px",
                     fontWeight: 700,
                     marginBottom: "8px",
@@ -268,7 +267,7 @@ export default function Home() {
                 </h3>
                 <p
                   style={{
-                    color: "#94A3B8",
+                    color: "#28292b",
                     fontSize: "14px",
                     lineHeight: 1.6,
                   }}
@@ -299,7 +298,7 @@ export default function Home() {
               marginBottom: "16px",
             }}
           >
-            What if they don't return it?
+           Guaranteed Product Safety
           </h2>
           <p
             style={{

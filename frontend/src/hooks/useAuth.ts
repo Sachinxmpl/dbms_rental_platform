@@ -3,16 +3,21 @@ import { useAuthStore } from "../store/authStore";
 import { usersApi } from "../api/client";
 
 export function useAuth() {
-  const { user, token, setAuth, clearAuth, updateUser } = useAuthStore();
+  const { user, token, setUser, clearAuth } = useAuthStore();
 
   useEffect(() => {
-    if (token && !user) {
+    if (token) {
       usersApi
         .getMe()
-        .then((u) => updateUser(u))
+        .then((u) => setUser(u))
         .catch(() => clearAuth());
     }
-  }, [token ,user, clearAuth , updateUser]);
+  }, [token]);
 
-  return { user, token, isLoggedIn: !!token, setAuth, clearAuth };
+  return {
+    user,
+    token,
+    isLoggedIn: !!token,
+    clearAuth,
+  };
 }

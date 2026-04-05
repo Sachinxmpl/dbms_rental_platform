@@ -20,6 +20,7 @@ export default function Profile() {
   const [idUrl, setIdUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  console.log(user)
 
   const set =
     (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>

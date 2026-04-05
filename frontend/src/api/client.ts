@@ -25,7 +25,7 @@ export const authApi = {
     email: string;
     password: string;
     name: string;
-    phone?: string;
+    phone: string;
   }) => api.post("/auth/register", data).then((r) => r.data),
   login: (data: { email: string; password: string }) =>
     api
